@@ -101,10 +101,10 @@ set viminfo='50,\"50,%
 "set textwidth=80        " always limit the width of text to 80
 
 " directory for *.swp files
-set directory=~/.my_links/tempDir
+"set directory=~/.my_links/tempDir
 
-set backup              " keep a backup file; delete old backups
-set backupdir=~/.my_links/vimBackup
+"set backup              " keep a backup file; delete old backups
+"set backupdir=~/.my_links/vimBackup
 "set backupext=bak
 "skip mutt's tmp files
 set backupskip=muttmail-*,*snotes*,*~,*passwd,*pass*,*pwd*
@@ -345,7 +345,7 @@ endif
 "	colorscheme default
 "endif
 
-colorscheme transdnlam
+"colorscheme transdnlam
 
 " make sure the autocommands are only included once, in case .vimrc is sourced
 " twice
