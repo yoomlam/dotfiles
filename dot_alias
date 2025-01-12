@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # use '\' to ignore aliases, e.g., \cp
 # use 'command' or 'builtin' to ignore functions
@@ -7,43 +6,67 @@
 
 UNAME=`uname`
 case "$UNAME" in
-  Linux)
-		alias rm='rm -vi'
-   	# The 'ls' family (this assumes you use the GNU ls)
-   	alias ls='echo $PWD >| $TMP/$USER-lastPWD; ls -h --color=auto'  # add colors for filetype recognition
-    ;;
-  Darwin)
-		alias rm='rm -vi'
-   	#alias ls='ls -h --color=auto'  # add colors for filetype recognition
-    ;;
-  SunOS)
-    ;;
+	Linux)
+	alias df='df -kTh'
+
+	# The 'ls' family (this assumes you use the GNU ls)
+	# alias ls='echo $PWD >| $TMP/$USER-lastPWD; ls -h --color=auto'
+
+	alias o='echo -n "open.sh: "; open.sh'
+	alias pt='pstree -n -u -G | highlight "$USER"'
+	;;
+
+	Darwin)
+	alias df='df -kh'
+
+	alias o='$HOME/bin/open_mac.sh'
+	alias pt='pstree -g 3 -u $USER'
+
+	alias sed='gsed'
+	;;
+
+	SunOS)
+	;;
 esac
 
 #############  Aliases and functions   #############
 # for generic (not set up, e.g. no $BINSRC directory) systems
 
+#no longer need; replaced by .inputrc entries - alias r='fc -s'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+cs(){
+    cd $1
+    ls
+}
+alias nnn='nnn -SQ'
+alias cdz='cd "`nnn -odp -`"'
+
+alias rm='rm -vi'
 alias mv='mv -vi'
 alias cp='cp -vp'
 alias du='du -kh'
 #alias +='pushd .'
 #alias _='popd'
 #alias j='jobs -l'
-alias df='df -kTh'
-#alias d='ls -altr'
-alias l='ls -al'   # show hidden files
-alias lx='ls -lXB'              # sort by extension
-alias lk='ls -lSr'              # sort by size
-alias lc='ls -lcr'              # sort by change time
-alias lu='ls -lur'              # sort by access time
-alias lr='ls -lR'               # recursive ls
-alias lt='ls -ltr'              # sort by date
-alias lm='ls -al --color | less'        # pipe through 'more'
-alias tree='tree -Csu'          # nice alternative to 'ls'
-alias ll='ls -l'
-#ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
-lss(){ for F in ${@:-*} ; do echo $PWD/$F; done | less; }
 
+alias l='ls -laFh'
+alias lt='ls -latrFh'           # sort by date
+alias tree='tree -Cus'          # nice alternative to 'ls'
+
+#ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
+# lss(){ for F in ${@:-*} ; do echo $PWD/$F; done | less; }
+
+# https://github.com/eza-community/eza/blob/main/man/eza_colors.5.md#examples
+export EZA_COLORS="da=37" # Turn the date column green
+alias x='eza --all --long --icons --no-user --time-style=iso'
+alias xx='x --tree --level=2'
+alias xxx='x --tree --level=3'
+
+alias grep='grep --color'
+# alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
 if [ ! "$LS_COLORS" ] ; then
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -53,21 +76,37 @@ fi
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+#ping; also try 'say'
+alias bel='tput bel'
 
-#no longer need; replaced by .inputrc entries - alias r='fc -s'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-cs(){
-    cd $1
-    ls
-}
 
-alias o='echo -n "open.sh: "; open.sh'
+case "$SHELL" in
+	/bin/zsh)
+	# Global aliases
+	alias -g NE="2> /dev/null"
+	alias -g NUL="&> /dev/null"
+
+	# Suffix aliases
+	alias -s txt="open -t"
+	alias -s md="open -t"
+	alias -s log="tail -f"
+	alias -s pdf="open"
+	#list whats inside packed file
+	alias -s zip="unzip -l"
+	;;
+esac
+
+alias fd='find . -type d -name'
+alias ff='find . -type f -name'
+
 
 bak(){
 	cp $1 "$1-`date +%Y%m%d%H%M%S`.bak"
 }
+
+alias gg='git grep -n'
+alias zg='lazygit'
+alias zd='lazydocker'
 
 alias mounts='showmount -e'
 mountiso(){
@@ -87,7 +126,6 @@ alias apt-get='sudo apt-get'
 alias perlcpan='perl -MCPAN -e shell'
 alias parted='echo "Do not use parted under kernel 2.6 !!"'
 alias tcprob='tcprobe -H 10 -i'
-alias v='vim'
 alias wget='wget --span-hosts --relative --level 2'
 alias dict='which dictd > /dev/null && dictd; dict '
 alias desktop='{ date; wmctrl -l; echo ---; pp; echo ===;} >> ~/desktopState.txt'
@@ -120,25 +158,25 @@ dif(){
 	esac
 }
 
-svn() {
-    case "$1" in
-        colordiff)
-            shift;
-            `which svn` diff --diff-cmd colordiff "$@"
-            ;;
-        vimdiff)
-            shift;
-            `which svn` diff --diff-cmd $MY_BIN/direct/svndiff -x vimdiff "$@"
-            ;;
-        xxdiff)
-            shift;
-            `which svn` diff --diff-cmd $MY_BIN/direct/xxdiff-svn.py "$@"
-            ;;
-        *)
-            `which svn` "$@"
-            ;;
-    esac
-}
+# svn() {
+#     case "$1" in
+#         colordiff)
+#             shift;
+#             `which svn` diff --diff-cmd colordiff "$@"
+#             ;;
+#         vimdiff)
+#             shift;
+#             `which svn` diff --diff-cmd $MY_BIN/direct/svndiff -x vimdiff "$@"
+#             ;;
+#         xxdiff)
+#             shift;
+#             `which svn` diff --diff-cmd $MY_BIN/direct/xxdiff-svn.py "$@"
+#             ;;
+#         *)
+#             `which svn` "$@"
+#             ;;
+#     esac
+# }
 
 
 duhome(){
@@ -176,7 +214,7 @@ c(){
 		return 0
 	fi
 
-	grep -q "$PWD" "$HOME/.pwd-$HOSTNAME" || echo "$PWD" >>"$HOME/.pwd-$HOSTNAME"
+	grep -q "$PWD" "$HOME/.pwd-$HOST" || echo "$PWD" >>"$HOME/.pwd-$HOST"
 	AUTOSRCDIR="$PWD"
 	while [ ! -f "$AUTOSRCDIR"/autosource ] && [ ! -f "$AUTOSRCDIR"/.autosource ] && [ "$AUTOSRCDIR" ] && [ "$AUTOSRCDIR" != "$HOME" ]; do
 		AUTOSRCDIR="${AUTOSRCDIR%/*}"
@@ -191,15 +229,16 @@ c(){
 
 	if [ -f "$AUTOSRCFILE" ]; then
 		if [ "$PWD" = "$AUTOSRCDIR" ] || read -p "About to source $AUTOSRCFILE:"; then
-			echo "_____________________________________"
-			echo -e "Autosourcing $AUTOSRCFILE:"
-			grep -E -- "alias|\(\)" "$AUTOSRCFILE" | grep -v "^#"
-			echo "_____________________________________"
+			if [ "$AUTOSOURCE_VERBOSE" ]; then
+				echo "_____________________________________"
+				echo -e "Autosourcing $AUTOSRCFILE:"
+				grep -E -- "alias|\(\)" "$AUTOSRCFILE" | grep -v "^#"
+				echo "_____________________________________"
+			fi
 			source "$AUTOSRCFILE"
-			# need ./ so it does search for autosource in $PATH
 		fi
-	else
-		echo "autosource file not found"
+	elif [ "$PWD" != "$HOME" ]; then
+		echo "autosource file not found" >&2
 	fi
 }
 
@@ -223,7 +262,6 @@ c(){
 # alias snotes='crypt.sh sortedText'
 # alias asnotes='SNOTES=~/.asnotes.asc GPGID=bl@gmail.com EDITOR=pico crypt.sh sortedText'
 
-alias pt='pstree -n -u -G | highlight "$USER"'
 
 # alias mUpParent='mvn versions:update-parent'
 # alias mUpParentToSnapshot='mvn versions:update-parent -DallowSnapshots=true'
@@ -240,7 +278,13 @@ function cv () {
     cdargs "$1" && cd "`cat "$HOME/.cdargsresult"`" ;
 }
 
+alias portListeners='lsof -nP -iTCP | grep LISTEN'
+alias coli='colima -p vz'
 alias pydocweb='python -m pydoc -p 4444'
 alias vs='open -a "Visual Studio Code"'
 
+# eval "$(thefuck --alias)"
+# alias removeAnsi="sed -e $'s/\x1b\[[0-9;]*m//g' -i"
+
+: ${HOSTNAME:=`hostname -s`}
 [ -f "~/.alias-$HOSTNAME" ] && source "~/.alias-$HOSTNAME"

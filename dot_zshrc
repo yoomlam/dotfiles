@@ -66,6 +66,7 @@ export UPDATE_ZSH_DAYS=15
 
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
+[ -f "$HOME/.dir_colors.src" ] && . $HOME/.dir_colors.src
 
 # Uncomment the following line to disable auto-setting terminal title.
 # called when rendering command prompt
@@ -217,6 +218,8 @@ echoTimer "bindkey"
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 
+# : ${HOSTNAME:=`hostname -s`}
+
 export H=$HOME
 export MY_BIN=$HOME/bin
 
@@ -268,7 +271,7 @@ alias sdkman='source "$HOME/.sdkman.src"'
 
 alias dockr_jupyter='echo "Running on port 8890"; docker run -p 8890:8888 -v `pwd`:/home/jovyan/on_host jupyter/scipy-notebook'
 alias dockr_jupyter_ruby='echo "Running on port 8891"; docker run -p 8891:8888 -v `pwd`:/home/jovyan/on_host rubydata/datascience-notebook'
-source ~/.alias-$HOST
+source ~/.alias
 echoTimer "aliases"
 
 # to hide the “user@hostname” info when you’re logged in as yourself on your local machine

@@ -1,5 +1,6 @@
 # Configuration file for the color ls utility
 # Copy this file to .dir_colors in your $HOME directory to override defaults in /etc
+# `dircolors` uses this to create dircolors.src
 
 # COLOR needs one of these arguments: 'tty' colorizes output to ttys, but not
 # pipes. 'all' adds color characters to all output. 'none' shuts colorization
@@ -56,7 +57,7 @@ NORMAL 00	# global default, although everything should be something.
 FILE 00 	# normal file
 DIR 04;36	# directory
 
-LINK 40;33 	# symbolic link
+LINK 33 	# symbolic link
 ORPHAN 41;33 # symlink to nonexistent file
 MISSING 41;33;04  # missing file
 
