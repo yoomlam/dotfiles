@@ -286,5 +286,6 @@ alias vs='open -a "Visual Studio Code"'
 # eval "$(thefuck --alias)"
 # alias removeAnsi="sed -e $'s/\x1b\[[0-9;]*m//g' -i"
 
-: ${HOSTNAME:=`hostname -s`}
-[ -f "~/.alias-$HOSTNAME" ] && source "~/.alias-$HOSTNAME"
+# SHORT_HOST is set by $ZSH/oh-my-zsh.sh
+: ${SHORT_HOST:=`hostname -s`}
+[ -f "~/.alias-$SHORT_HOST" ] && source "~/.alias-$SHORT_HOST"
