@@ -67,8 +67,11 @@ fi
 # Case-sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
 
+# Auto updates will cause the ~/.oh-my-zsh directory to drift out of sync with chezmoi's source state.
+# https://www.chezmoi.io/user-guide/include-files-from-elsewhere/#include-a-subdirectory-from-a-url
+# To update Oh My Zsh and its plugins, refresh the downloaded archives: chezmoi --refresh-externals apply
+# instead of manually updating OMZ: upgrade_oh_my_zsh
 DISABLE_AUTO_UPDATE="true"
-# To manually update, run: upgrade_oh_my_zsh
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS=true
