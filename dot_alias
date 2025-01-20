@@ -35,11 +35,9 @@ esac
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-cs(){
-    cd $1
-    ls
-}
+
 alias nnn='nnn -SQ'
+# https://github.com/jarun/nnn/wiki/Basic-use-cases#file-picker
 alias cdz='cd "`nnn -odp -`"'
 
 alias rm='rm -vi'
@@ -202,7 +200,7 @@ whi(){
 #    dif $DUDIR/du.log{,.bak}
 # }
 
-c(){
+a(){
 	# if [ "$1" ] ; then
 	# 	ARG_TYPE=`type -t "$1"`
 	# 	echo "ARG_TYPE=$ARG_TYPE"
@@ -320,4 +318,4 @@ alias vs='open -a "Visual Studio Code"'
 
 # SHORT_HOST is set by $ZSH/oh-my-zsh.sh
 : ${SHORT_HOST:=`hostname -s`}
-[ -f "~/.alias-$SHORT_HOST" ] && source "~/.alias-$SHORT_HOST"
+[ -f "$HOME/.alias-$SHORT_HOST" ] && source "$HOME/.alias-$SHORT_HOST"

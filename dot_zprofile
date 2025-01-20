@@ -6,9 +6,10 @@ export CLICOLOR=1
 export BROWSER=open
 export VISUAL="subl --wait"
 export XIVIEWER=open
-export LESS="-F -X $LESS"
 # Setting this to only `less` causes some (chezmoi) output to show `ESC` instead of rendering colors
-export PAGER='less -FRX'
+# https://www.chezmoi.io/user-guide/frequently-asked-questions/troubleshooting/#the-output-of-chezmoi-diff-is-broken-and-does-not-contain-color-what-could-be-wrong
+export LESS="-R -F -X $LESS"
+# export PAGER='less -FRX'
 
 export EDITOR=vim
 # Preferred editor for local and remote sessions

@@ -343,6 +343,7 @@ plugins=(
   # gh
   # history
   zsh-interactive-cd
+  z
   # git
   sublime
   poetry
