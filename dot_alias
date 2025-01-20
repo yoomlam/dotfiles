@@ -312,6 +312,7 @@ alias portListeners='lsof -nP -iTCP | grep LISTEN'
 
 alias pydocweb='python -m pydoc -p 4444'
 alias vs='open -a "Visual Studio Code"'
+alias cm='chezmoi'
 
 # eval "$(thefuck --alias)"
 # alias removeAnsi="sed -e $'s/\x1b\[[0-9;]*m//g' -i"
