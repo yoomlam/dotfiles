@@ -37,9 +37,6 @@ if [ -e "$HOME/.tmp" ]; then
   }
 fi
 
-
-########## The following is only run when shell is interactive ######################
-
 # Speed up zsh:
 # https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load.html#a-note-on-profiling-with-zshzprof
 # https://medium.com/@dannysmith/little-thing-2-speeding-up-zsh-f1860390f92
@@ -216,15 +213,10 @@ fi
 
 ### Lazy-initializers
 
-# When the app is first run, function _bootstrap_$APP() is run.
-# If no args are provided, then the specified DEFAULT_APP_CMD is run.
-DEFAULT_APP_CMDS=(
-  "nnn"
-  "conda env list"
-  "go"
-)
-for DEFAULT_APP_CMD in $DEFAULT_APP_CMDS; do
-  local APP=${DEFAULT_APP_CMD%% *}
+_add_bootstrap_func(){
+  local APP=${1%% *}
+  # When the app is first run, function _bootstrap_$APP() is run.
+  # If no args are provided, then the specified $1 is run.
   eval "function $APP(){
     unfunction $APP
     # echo \"(lazy loading: $APP)\"
@@ -232,15 +224,30 @@ for DEFAULT_APP_CMD in $DEFAULT_APP_CMDS; do
     if [ \"\$1\" ]; then
       eval $APP \"\$@\"
     else
-      eval $DEFAULT_APP_CMD
+      eval "$1"
     fi
   }"
-done
+}
 
+_add_bootstrap_func "ssh"
+_bootstrap_ssh(){
+  [ "$SSH_AUTH_SOCK" ] || source $HOME/.ssh/ssh-agent.src
+
+  # check if shell is interactive
+  if [[ $- == *i* ]]; then
+    if ! ssh-add -l > /dev/null; then
+      ssh-add
+    fi
+  fi
+}
+
+_add_bootstrap_func "nnn"
 _bootstrap_nnn(){
   # bookmarks
   export NNN_BMS='s:~/Desktop;d:~/Documents;D:~/Downloads/;a:~/DockApps;v:~/dev'
 }
+
+_add_bootstrap_func "conda env list"
 _bootstrap_conda(){
   # >>> conda initialize >>>
   # !! Contents within this block are managed by 'conda init' !!
@@ -257,6 +264,8 @@ _bootstrap_conda(){
   unset __conda_setup
   # <<< conda initialize <<<  
 }
+
+_add_bootstrap_func "go"
 _bootstrap_go(){
   source ~/.golangrc
 }
@@ -265,12 +274,6 @@ _bootstrap_go(){
 #   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 #   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 # }
-_bootstrap_heroku(){
-  # heroku autocomplete setup
-  HEROKU_AC_ZSH_SETUP_PATH=~/Library/Caches/heroku/autocomplete/zsh_setup
-  test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH
-}
-
 
 
 # icu4c is keg-only, which means it was not symlinked into /usr/local,
@@ -317,7 +320,7 @@ __ECHO_TIMER "Done zshrc part 1"
 __ECHO_TIMER "p10k"
 
 if [ "$HOMEBREW_PREFIX" ]; then
-  # TODO: replace asdf and direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
+  # TODO: replace asdf and dotenv/direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
   #   My also be able to replace functionality in chpwd_functions
   #   There's a OMZ mise plugin
   # Instead of using the asdf zsh plugin
@@ -341,31 +344,17 @@ export NVM_COMPLETION=true
 
 # Reminder to add new plugins to .chezmoiexternal.toml
 plugins=(
-  # common-aliases
   gnu-utils
   dotenv
-  # gh
-  # history
   zsh-interactive-cd
   z
-  # git
   sublime
-  # chezmoi
-  #codeclimate
   # Remember to replace `eval ...` calls with `_evalcache ...`; ~/.zsh-evalcache/
   evalcache
-  # slow:
   zsh-autosuggestions
-  # slow:
-  # rbenv
 
   # Instead, manually run `omz update && upgrade_oh_my_zsh_custom`
   # autoupdate
-
-  # poetry
-
-  # Must be last plugin to compute highlighting for the current command-line buffer
-  zsh-syntax-highlighting
 )
 
 # TODO: remove OS-specific conditional; do we need zsh-nvm or can it be loaded by .env?
@@ -377,6 +366,11 @@ if [ `uname -o` = "Darwin" ]; then
     zsh-nvm
   )
 fi
+
+plugins+=(
+  # Must be last plugin to compute highlighting for the current command-line buffer
+  zsh-syntax-highlighting
+)
 
 # Uncomment the following to time each plugin or temporarily modify $ZSH/oh-my-zsh.sh
 # TIME_PLUGINS="true"
@@ -395,11 +389,6 @@ __ECHO_TIMER "___ oh-my-zsh.sh"
 source $ZSH/oh-my-zsh.sh
 __ECHO_TIMER "^^^ oh-my-zsh.sh"
 
-alias dateStr='date +%Y-%m-%d-%T'
-
-alias dockr_jupyter='echo "Running on port 8890"; docker run -p 8890:8888 -v `pwd`:/home/jovyan/on_host jupyter/scipy-notebook'
-alias dockr_jupyter_ruby='echo "Running on port 8891"; docker run -p 8891:8888 -v `pwd`:/home/jovyan/on_host rubydata/datascience-notebook'
-
 source ~/.alias
 __ECHO_TIMER "funcs and aliases"
 
@@ -408,9 +397,6 @@ __ECHO_TIMER "funcs and aliases"
 #export PROMPT="$fg_bold[blue][ $fg[red]%t $fg_bold[blue]] $fg_bold[blue] [ $fg[red]%~ $(git_prompt_info)$fg[yellow]$(rvm_prompt_info)$fg_bold[blue] ]$reset_color
 # $ "
 
-
-# eval "$(direnv hook zsh)"
-# _evalcache direnv hook zsh
 
 # _my_conda_env(){
 #   # Export MY_CONDA_ENV in the .envrc file
@@ -447,7 +433,6 @@ if [ `uname -o` = "Darwin" ]; then
   __ECHO_TIMER "atuin"
 fi
 
-[ "$PWD" = "$HOME" ] || a
-__ECHO_TIMER "a"
+# [ "$PWD" = "$HOME" ] || a
 
 __ECHO_TIMER "Done zshrc"

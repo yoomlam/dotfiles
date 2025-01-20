@@ -1,4 +1,6 @@
 
+[ -f "$HOME/.alias-macos" ] && source "$HOME/.alias-macos"
+
 alias df='df -kh'
 
 #####
@@ -15,9 +17,59 @@ alias df='df -kh'
 # alias finan='cd ~/dev/finanrails && source autosource'
 # alias bd='cd ~/dev/benefit-delivery-systems && source .autosource'
 
-alias coli='colima -p vz'
+_add_bootstrap_func "colima"
+_bootstrap_colima(){
+  # Ensure ssh keys are added b/c colima no longer shows the ssh "Enter passphrase" prompt
+  ssh
+}
 
-alias o='$HOME/bin/open_mac.sh'
+alias coli='colima -p ${COLIMA_VM:=vz}'
+colima_vz(){
+  colima list
+  if ! coli status; then
+    if ! coli start; then
+      echo "Could not start colima!"
+      return 400
+    fi
+  fi
+
+  export COLIMA_VM_SOCKET="${HOME}/.colima/${COLIMA_VM}/docker.sock"
+  # export DOCKER_HOST="unix://${COLIMA_VM_SOCKET}"
+  # https://github.com/abiosoft/colima/discussions/609#discussioncomment-4892088:
+  # You can have the DOCKER_HOST environment set for the current shell, it takes precedence over `docker context`.
+  docker context use colima-${COLIMA_VM}
+
+  # https://dustinrue.com/2022/10/colima-cpu-architecture-emulation/
+  # Using Colima’s built in CPU architecture emulation it is possible to create a Colima profile for either arm64 (aarch64) or amd64 (x86_64)
+  # created using: colima --profile vz start --arch aarch64 --vm-type=vz --mount-type=virtiofs --cpu 6 --memory 12
+  # https://github.com/lima-vm/lima#how-it-works
+  # https://www.infoq.com/news/2022/06/apple-virtualization-framework/
+
+  docker context list # The default context may be based on DOCKER_HOST
+  # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+  # export DOCKER_HOST="unix://${HOME}/.colima/docker.sock"
+}
+
+imageArchs(){
+  IMGS=$(docker images --format "{{.ID}} {{.Repository}} {{.Tag}}" | while read i r t; do
+    echo "$i\t"$(docker image inspect $i |grep "Architecture")"\t$r\t$t"
+  done)
+  echo $IMGS | grep -v "arm64"
+  echo $IMGS | grep "arm64"
+}
+ds(){
+  echo "----- RUNNING CONTAINERS -----"
+  docker ps
+  echo "----- ALL CONTAINERS -----"
+  docker container list -a
+  echo "----- VOLUMES -----"
+  docker volume list
+  if [ "$1" ]; then
+     echo "----- IMAGES -----"
+     docker images
+     imageArchs
+  fi
+}
 
 alias pt='pstree -g 3 -u $USER'
 
@@ -47,6 +99,7 @@ EOF
 # Remove .DS_Store files recursively in a directory, default .
 function rmdsstore() {
   find "${@:-.}" -type f -name .DS_Store -delete
+  find "${@:-.}" -type f -name 'Icon?' -print -delete;
 }
 
 # : ${HOSTNAME:=$HOST}
@@ -92,3 +145,44 @@ function rmdsstore() {
 # 		echo "autosource file not found" >&2
 # 	fi
 # }
+
+
+_bootstrap_heroku(){
+  # heroku autocomplete setup
+  local HEROKU_AC_ZSH_SETUP_PATH=~/Library/Caches/heroku/autocomplete/zsh_setup
+  test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH
+}
+
+_add_bootstrap_func "code"
+_bootstrap_code(){
+  # https://code.visualstudio.com/docs/editor/command-line#_launching-from-command-line
+  local VSCODE_BIN_PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  export PATH="$VSCODE_BIN_PATH:$PATH"
+}
+
+
+o(){
+  local P="$1"
+
+  if [ -z "$P" ]; then
+    P=`pbpaste -Prefer txt`
+  fi
+
+  echo "Opening: '$P'" >> ~/open-mac.log
+  case $P in
+    *dev/labs-* | *labs-decision-support-tool/*)
+      code "$P";;
+    http://* | https://* | vnc://*)
+      open -u "$P";;
+    *)
+      if [ "$OPENTEXT" ]; then
+        open -t "$P"
+      elif [ "$OPENFINDER" ]; then
+        # Open/Select in Finder
+        open -R "$P"
+      else
+        open "$P" || open -t "$P"
+      fi
+      ;;
+  esac
+}

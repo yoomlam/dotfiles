@@ -33,3 +33,7 @@ chezmoi usage ([user guide](https://www.chezmoi.io/user-guide)):
 chezmoi contents:
 - [~/.oh-my-zsh is imported](https://www.chezmoi.io/user-guide/include-files-from-elsewhere/#include-a-subdirectory-from-a-url) and managed in `.chezmoiexternal.toml`, so any modifications would be lost after a `chezmoi apply`
 - Only specific plugins are included as specified in `.chezmoiexternal.toml`
+
+Scripts/utils:
+- frequent or commonly used scripts are under `~/bin`
+- other scripts from cloud storage can be symlinked to `~/bin` or `~/.local/bin` ([XDG standard](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html))
