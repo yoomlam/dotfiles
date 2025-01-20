@@ -17,4 +17,5 @@
 /.bash*
 {{- else}}
 /.hammerspoon
+/Brewfile
 {{- end}}
