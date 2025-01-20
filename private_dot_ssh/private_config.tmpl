@@ -1,0 +1,10 @@
+Include {{ .chezmoi.homeDir }}/.colima/ssh_config
+
+# Maintain SSH keys in macOS Keychain
+# https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+# https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+Host github.com
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile {{ .ssh.id_file }}
