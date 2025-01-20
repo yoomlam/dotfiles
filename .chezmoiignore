@@ -1,4 +1,4 @@
-.DS_Store
+**/.DS_Store
 /README.md
 /.vim
 /.mime.types
@@ -13,3 +13,5 @@
 /.oh-my-zsh/plugins/**/LICENSE
 /.oh-my-zsh/plugins/z/img/
 
+# Ignore Bash for now
+/.bash*

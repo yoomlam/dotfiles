@@ -207,10 +207,11 @@ __ECHO_TIMER "bindkey"
 
 ## App-specific configurations
 
-# To create file: $(brew --prefix)/opt/fzf/install
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-__ECHO_TIMER "fzf"
-
+if [ "$HOMEBREW_PREFIX" ]; then
+  # To create file: $(brew --prefix)/opt/fzf/install
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  __ECHO_TIMER "fzf"
+fi
 
 ### Lazy-initializers
 
@@ -314,15 +315,17 @@ __ECHO_TIMER "Done zshrc part 1"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 __ECHO_TIMER "p10k"
 
-# TODO: replace asdf and direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
-#   My also be able to replace functionality in chpwd_functions
-#   There's a OMZ mise plugin
-# Instead of using the asdf zsh plugin
-# https://github.com/ohmyzsh/ohmyzsh/issues/10484#issuecomment-997545691
-unset ASDF_DIR
-source $(brew --prefix asdf)/libexec/asdf.sh
-# TIP: `asdf reshim python` after a `pip install` https://til.hashrocket.com/posts/ques11vrjs-get-pip-installed-executables-into-the-asdf-path
-__ECHO_TIMER "asdf"
+if [ "$HOMEBREW_PREFIX" ]; then
+  # TODO: replace asdf and direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
+  #   My also be able to replace functionality in chpwd_functions
+  #   There's a OMZ mise plugin
+  # Instead of using the asdf zsh plugin
+  # https://github.com/ohmyzsh/ohmyzsh/issues/10484#issuecomment-997545691
+  unset ASDF_DIR
+  source $(brew --prefix asdf)/libexec/asdf.sh
+  # TIP: `asdf reshim python` after a `pip install` https://til.hashrocket.com/posts/ques11vrjs-get-pip-installed-executables-into-the-asdf-path
+  __ECHO_TIMER "asdf"
+fi
 
 # Plugins are in $ZSH_CUSTOM
 # Which plugins would you like to load?
@@ -346,7 +349,6 @@ plugins=(
   z
   # git
   sublime
-  poetry
   # chezmoi
   #codeclimate
   # Remember to replace `eval ...` calls with `_evalcache ...`; ~/.zsh-evalcache/
@@ -359,13 +361,21 @@ plugins=(
   # Instead, manually run `omz update && upgrade_oh_my_zsh_custom`
   # autoupdate
 
-  # lazy-load nvm; Actual loading of nvm is triggered by running the nvm, node, npm, ...
-  zsh-nvm
   # poetry
 
   # Must be last plugin to compute highlighting for the current command-line buffer
   zsh-syntax-highlighting
 )
+
+# TODO: remove OS-specific conditional; do we need zsh-nvm or can it be loaded by .env?
+: ${SHORT_HOST:=`hostname -s`}
+if [ `uname -o` = "Darwin" ]; then
+  plugins+=(
+    poetry
+    # lazy-load nvm; Actual loading of nvm is triggered by running the nvm, node, npm, ...
+    zsh-nvm
+  )
+fi
 
 # Uncomment the following to time each plugin or temporarily modify $ZSH/oh-my-zsh.sh
 # TIME_PLUGINS="true"
@@ -428,10 +438,13 @@ __ECHO_TIMER "funcs and aliases"
 # If you don't want/need a background service you can just run:
 #  /opt/homebrew/opt/postgresql@14/bin/postgres -D /opt/homebrew/var/postgresql@14
 
-#. "$HOME/.atuin/bin/env"
-export PATH="$HOME/.atuin/bin:$PATH"
-_evalcache atuin init zsh
-__ECHO_TIMER "atuin"
+# TODO: remove OS-specific conditional
+if [ `uname -o` = "Darwin" ]; then
+  #. "$HOME/.atuin/bin/env"
+  export PATH="$HOME/.atuin/bin:$PATH"
+  _evalcache atuin init zsh
+  __ECHO_TIMER "atuin"
+fi
 
 [ "$PWD" = "$HOME" ] || c
 __ECHO_TIMER "c"
