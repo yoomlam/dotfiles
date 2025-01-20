@@ -24,6 +24,17 @@ if [ -e "$HOME/.tmp" ]; then
 
   export MY_TRASH="$TMP/trash"
   [ -d "$MY_TRASH" ] || mkdir "$MY_TRASH"
+
+  trash(){
+      for F in "$@"; do
+          DESTDIR="$MY_TRASH/`pwd`/`dirname "$F"`";
+          mkdir -p "$DESTDIR"
+          mv -fv "$F" "$DESTDIR"
+      done
+  }
+  utrash(){
+    mv -v $MY_TRASH/`pwd`/$* `pwd`
+  }
 fi
 
 
@@ -83,7 +94,7 @@ DISABLE_AUTO_UPDATE="true"
 # Uncomment the following line to disable auto-setting terminal title.
 # called when rendering command prompt
 DISABLE_AUTO_TITLE="true"
-function _my_title_precmd () {
+_my_title_precmd(){
   # Allows my functions to set the window title
   if [ "$MY_WINDOWTITLE" ]; then
     echo -ne "\033]0;${MY_WINDOWTITLE}\007"
@@ -303,6 +314,9 @@ __ECHO_TIMER "Done zshrc part 1"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 __ECHO_TIMER "p10k"
 
+# TODO: replace asdf and direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
+#   My also be able to replace functionality in chpwd_functions
+#   There's a OMZ mise plugin
 # Instead of using the asdf zsh plugin
 # https://github.com/ohmyzsh/ohmyzsh/issues/10484#issuecomment-997545691
 unset ASDF_DIR
@@ -321,12 +335,18 @@ __ECHO_TIMER "asdf"
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 
+# Reminder to add new plugins to .chezmoiexternal.toml
 plugins=(
   # common-aliases
+  gnu-utils
+  dotenv
+  # gh
   # history
   zsh-interactive-cd
   # git
   sublime
+  poetry
+  # chezmoi
   #codeclimate
   # Remember to replace `eval ...` calls with `_evalcache ...`; ~/.zsh-evalcache/
   evalcache
@@ -364,7 +384,6 @@ source $ZSH/oh-my-zsh.sh
 __ECHO_TIMER "^^^ oh-my-zsh.sh"
 
 alias dateStr='date +%Y-%m-%d-%T'
-source ~/.my_rc/bin/src/funcs.src
 
 alias dockr_jupyter='echo "Running on port 8890"; docker run -p 8890:8888 -v `pwd`:/home/jovyan/on_host jupyter/scipy-notebook'
 alias dockr_jupyter_ruby='echo "Running on port 8891"; docker run -p 8891:8888 -v `pwd`:/home/jovyan/on_host rubydata/datascience-notebook'
@@ -379,8 +398,16 @@ __ECHO_TIMER "funcs and aliases"
 
 
 # eval "$(direnv hook zsh)"
-_evalcache direnv hook zsh
+# _evalcache direnv hook zsh
 
+# _my_conda_env(){
+#   # Export MY_CONDA_ENV in the .envrc file
+#   [ "$MY_CONDA_ENV" ] || return
+#   conda activate "$MY_CONDA_ENV"
+#   unset MY_CONDA_ENV
+# }
+# zsh special hook function when changing directory
+# chpwd_functions+=(_my_conda_env)
 
 # pnpm
 # export PNPM_HOME="~/Library/pnpm"

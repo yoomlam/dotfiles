@@ -22,6 +22,9 @@
     include = [
         "ohmyzsh-master/plugins/zsh-interactive-cd/**",
         "ohmyzsh-master/plugins/sublime/**",
+        "ohmyzsh-master/plugins/dotenv/**",
+        "ohmyzsh-master/plugins/gnu-utils/**",
+        "ohmyzsh-master/plugins/poetry/**",
     ]
 [".oh-my-zsh/custom/plugins/evalcache"]
     type = "archive"

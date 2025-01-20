@@ -1,0 +1,94 @@
+
+alias df='df -kh'
+
+#####
+# Custom DSVA Appeals config
+#####
+# alias mfa="source issue_mfa Yoom.Lam"
+# alias sockson="socks on Yoom.Lam"
+# alias socksoff="socks off"
+# dsva=setup
+
+# alias vr='cd ~/dev/abd-vro && source autosource'
+# alias vets='cd ~/dev/vets-api && source autosource'
+# alias cf='cd ~/dev/caseflow && source .autosource'
+# alias finan='cd ~/dev/finanrails && source autosource'
+# alias bd='cd ~/dev/benefit-delivery-systems && source .autosource'
+
+alias coli='colima -p vz'
+
+alias o='$HOME/bin/open_mac.sh'
+
+alias pt='pstree -g 3 -u $USER'
+
+alias removeAnsi="sed -e $'s/\x1b\[[0-9;]*m//g' -i"
+
+# Current Finder path
+function pfd() {
+  osascript 2>/dev/null <<EOF
+    tell application "Finder"
+      return POSIX path of (insertion location as alias)
+    end tell
+EOF
+}
+# Current Finder selection
+function pfs() {
+  osascript 2>/dev/null <<EOF
+    set output to ""
+    tell application "Finder" to set the_selection to selection
+    set item_count to count the_selection
+    repeat with item_index from 1 to count the_selection
+      if item_index is less than item_count then set the_delimiter to "\n"
+      if item_index is item_count then set the_delimiter to ""
+      set output to output & ((item item_index of the_selection as alias)'s POSIX path) & the_delimiter
+    end repeat
+EOF
+}
+# Remove .DS_Store files recursively in a directory, default .
+function rmdsstore() {
+  find "${@:-.}" -type f -name .DS_Store -delete
+}
+
+# : ${HOSTNAME:=$HOST}
+# c(){
+# 	if [ "$1" ] ; then
+# 		ARG_TYPE=`type -t "$1"`
+# 		echo "ARG_TYPE=$ARG_TYPE"
+# 		if [ -d "$1" ]; then
+# 			local CDIR="$1"
+# 		elif [ "$ARG_TYPE" == "file" ]; then
+# 			local CDIR="$(dirname $(which $1))"
+# 		else
+# 			echo "What is $1?"
+# 		fi
+# 		cd "$CDIR"
+# 		return 0
+# 	fi
+
+# 	grep -q "$PWD" "$HOME/.pwd-$HOST" || echo "$PWD" >>"$HOME/.pwd-$HOST"
+# 	AUTOSRCDIR="$PWD"
+# 	while [ ! -f "$AUTOSRCDIR"/autosource ] && [ ! -f "$AUTOSRCDIR"/.autosource ] && [ "$AUTOSRCDIR" ] && [ "$AUTOSRCDIR" != "$HOME" ]; do
+# 		AUTOSRCDIR="${AUTOSRCDIR%/*}"
+# 		echo "Searching in: $AUTOSRCDIR"
+# 	done
+
+# 	if [ -f "$AUTOSRCDIR/autosource" ]; then
+# 		AUTOSRCFILE="$AUTOSRCDIR/autosource"
+# 	elif [ -f "$AUTOSRCDIR/.autosource" ]; then
+# 		AUTOSRCFILE="$AUTOSRCDIR/.autosource"
+# 	fi
+
+# 	if [ -f "$AUTOSRCFILE" ]; then
+# 		if [ "$PWD" = "$AUTOSRCDIR" ] || read -p "About to source $AUTOSRCFILE:"; then
+# 			if [ "$AUTOSOURCE_VERBOSE" ]; then
+# 				echo "_____________________________________"
+# 				echo -e "Autosourcing $AUTOSRCFILE:"
+# 				grep -E -- "alias|\(\)" "$AUTOSRCFILE" | grep -v "^#"
+# 				echo "_____________________________________"
+# 			fi
+# 			source "$AUTOSRCFILE"
+# 		fi
+# 	elif [ "$PWD" != "$HOME" ]; then
+# 		echo "autosource file not found" >&2
+# 	fi
+# }

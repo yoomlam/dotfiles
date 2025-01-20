@@ -21,8 +21,6 @@ case "$UNAME" in
 
 	alias o='$HOME/bin/open_mac.sh'
 	alias pt='pstree -g 3 -u $USER'
-
-	alias sed='gsed'
 	;;
 
 	SunOS)
@@ -53,6 +51,7 @@ alias du='du -kh'
 #alias j='jobs -l'
 
 alias l='ls -laFh'
+alias ll='ls -lFh'
 alias lt='ls -latrFh'           # sort by date
 alias tree='tree -Cus'          # nice alternative to 'ls'
 
@@ -61,9 +60,10 @@ alias tree='tree -Cus'          # nice alternative to 'ls'
 
 # https://github.com/eza-community/eza/blob/main/man/eza_colors.5.md#examples
 export EZA_COLORS="da=37" # Turn the date column green
-alias x='eza --all --long --icons --no-user --time-style=iso'
+alias x='eza --all --long --icons --no-user --time-style=long-iso --git --group-directories-first'
 alias xx='x --tree --level=2'
 alias xxx='x --tree --level=3'
+alias xd='x -D'
 
 alias grep='grep --color'
 # alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
@@ -78,21 +78,28 @@ fi
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 #ping; also try 'say'
 alias bel='tput bel'
-
+# alias buzz='xterm -e "read -p Done"'
+# alias beep_='xterm -e "( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.5s ; kill -9 $pid"'
 
 case "$SHELL" in
 	/bin/zsh)
+	# https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/common-aliases
 	# Global aliases
 	alias -g NE="2> /dev/null"
 	alias -g NUL="&> /dev/null"
 
 	# Suffix aliases
-	alias -s txt="open -t"
+	alias -s txt="subl"
 	alias -s md="open -t"
+	alias -s json="subl"
 	alias -s log="tail -f"
 	alias -s pdf="open"
+	alias -s htm="open"
+	alias -s html="open"
 	#list whats inside packed file
 	alias -s zip="unzip -l"
+	alias -s tar="tar tf"
+	alias -s tgz="echo"
 	;;
 esac
 
@@ -108,55 +115,51 @@ alias gg='git grep -n'
 alias zg='lazygit'
 alias zd='lazydocker'
 
-alias mounts='showmount -e'
-mountiso(){
-	DIRNAME=`basename "$1" .iso`
-	mkdir $DIRNAME
-	sudo mount -t iso9660 -o loop -o unhide "$1" $DIRNAME
-}
+# alias mounts='showmount -e'
+# mountiso(){
+# 	DIRNAME=`basename "$1" .iso`
+# 	mkdir $DIRNAME
+# 	sudo mount -t iso9660 -o loop -o unhide "$1" $DIRNAME
+# }
 
-alias shot='import -window root $HOME/root.jpeg'
 alias tidyxml='tidy -xml -indent -wrap 120'
 alias jsontidy='python -mjson.tool'
 
-
-alias htmlview='$BROWSER'
-alias route='route -n'
-alias apt-get='sudo apt-get'
-alias perlcpan='perl -MCPAN -e shell'
-alias parted='echo "Do not use parted under kernel 2.6 !!"'
-alias tcprob='tcprobe -H 10 -i'
-alias wget='wget --span-hosts --relative --level 2'
-alias dict='which dictd > /dev/null && dictd; dict '
-alias desktop='{ date; wmctrl -l; echo ---; pp; echo ===;} >> ~/desktopState.txt'
-alias printerList='lpstat -p -d'
-
-alias buzz='xterm -e "read -p Done"'
-alias beep_='xterm -e "( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.5s ; kill -9 $pid"'
+# alias shot='import -window root $HOME/root.jpeg'
+# alias htmlview='$BROWSER'
+# alias route='route -n'
+# alias apt-get='sudo apt-get'
+# alias perlcpan='perl -MCPAN -e shell'
+# alias parted='echo "Do not use parted under kernel 2.6 !!"'
+# alias tcprob='tcprobe -H 10 -i'
+# alias wget='wget --span-hosts --relative --level 2'
+# alias dict='which dictd > /dev/null && dictd; dict '
+# alias desktop='{ date; wmctrl -l; echo ---; pp; echo ===;} >> ~/desktopState.txt'
+# alias printerList='lpstat -p -d'
 
 whi(){
 	ls -al `which $1`
 }
 
-alias path='echo -e ${PATH//:/\\n}'
+# alias path='echo -e ${PATH//:/\\n}'
 
-dif(){
-    case "$DISPLAY" in
-		:*)
-			xxdiff "$@"
-		;;
-		*:*)
-	    	MY_TERM=xterm xterm.sh -geometry 250x60+0+0 -e vimdiff "$@"
-		;;
-		*)
-			if which colordiff > /dev/null; then
-				colordiff "$@"
-			else
-				diff "$@"
-			fi
-		;;
-	esac
-}
+# dif(){
+#     case "$DISPLAY" in
+# 		:*)
+# 			xxdiff "$@"
+# 		;;
+# 		*:*)
+# 	    	MY_TERM=xterm xterm.sh -geometry 250x60+0+0 -e vimdiff "$@"
+# 		;;
+# 		*)
+# 			if which colordiff > /dev/null; then
+# 				colordiff "$@"
+# 			else
+# 				diff "$@"
+# 			fi
+# 		;;
+# 	esac
+# }
 
 # svn() {
 #     case "$1" in
@@ -179,47 +182,47 @@ dif(){
 # }
 
 
-duhome(){
-	local DUDIR=$HOME/NOBACKUP
-   mv -vf $DUDIR/du.log{,.bak}
-	command du -mc ~/ ~/.[a-z]* | sort -n -r | uniq >| $DUDIR/du.log.tmp
-	{ date
-	command du -hc ~/ | grep '^[[:digit:]\.]*[G]' | sort -n -r
-	echo "========  top-level directories under $HOME over 10MB ============"
-	grep "^[[:digit:]\.][[:digit:]\.][[:digit:]\.][[:digit:]\.]*[[:space:]]$HOME"'/[^/]*$' $DUDIR/du.log.tmp | sort -n -r
-	echo "---- all directories over 10MB --"
-	grep '^[[:digit:]\.][[:digit:]\.][[:digit:]\.]' $DUDIR/du.log.tmp | grep -v "$HOME/NOBACKUP/" | grep -v "$HOME/.m2" | sort -n -r
-	} > $DUDIR/du.log
+# duhome(){
+# 	local DUDIR=$HOME/NOBACKUP
+#    mv -vf $DUDIR/du.log{,.bak}
+# 	command du -mc ~/ ~/.[a-z]* | sort -n -r | uniq >| $DUDIR/du.log.tmp
+# 	{ date
+# 	command du -hc ~/ | grep '^[[:digit:]\.]*[G]' | sort -n -r
+# 	echo "========  top-level directories under $HOME over 10MB ============"
+# 	grep "^[[:digit:]\.][[:digit:]\.][[:digit:]\.][[:digit:]\.]*[[:space:]]$HOME"'/[^/]*$' $DUDIR/du.log.tmp | sort -n -r
+# 	echo "---- all directories over 10MB --"
+# 	grep '^[[:digit:]\.][[:digit:]\.][[:digit:]\.]' $DUDIR/du.log.tmp | grep -v "$HOME/NOBACKUP/" | grep -v "$HOME/.m2" | sort -n -r
+# 	} > $DUDIR/du.log
 
-   #ls -lta $HOME/ >> $DUDIR/du.log
+#    #ls -lta $HOME/ >> $DUDIR/du.log
 
-	# echo "===================="
-	# cat $DUDIR/du.log
-	#rm -f $DUDIR/du.log.tmp
-   dif $DUDIR/du.log{,.bak}
-}
+# 	# echo "===================="
+# 	# cat $DUDIR/du.log
+# 	#rm -f $DUDIR/du.log.tmp
+#    dif $DUDIR/du.log{,.bak}
+# }
 
 c(){
-	if [ "$1" ] ; then
-		ARG_TYPE=`type -t "$1"`
-		echo "ARG_TYPE=$ARG_TYPE"
-		if [ -d "$1" ]; then
-			local CDIR="$1"
-		elif [ "$ARG_TYPE" == "file" ]; then
-			local CDIR="$(dirname $(which $1))"
-		else
-			echo "What is $1?"
-		fi
-		cd "$CDIR"
-		return 0
-	fi
+	# if [ "$1" ] ; then
+	# 	ARG_TYPE=`type -t "$1"`
+	# 	echo "ARG_TYPE=$ARG_TYPE"
+	# 	if [ -d "$1" ]; then
+	# 		local CDIR="$1"
+	# 	elif [ "$ARG_TYPE" == "file" ]; then
+	# 		local CDIR="$(dirname $(which $1))"
+	# 	else
+	# 		echo "What is $1?"
+	# 	fi
+	# 	cd "$CDIR"
+	# 	return 0
+	# fi
 
-	grep -q "$PWD" "$HOME/.pwd-$HOST" || echo "$PWD" >>"$HOME/.pwd-$HOST"
+	# grep -q "$PWD" "$HOME/.pwd-$HOST" || echo "$PWD" >>"$HOME/.pwd-$HOST"
 	AUTOSRCDIR="$PWD"
-	while [ ! -f "$AUTOSRCDIR"/autosource ] && [ ! -f "$AUTOSRCDIR"/.autosource ] && [ "$AUTOSRCDIR" ] && [ "$AUTOSRCDIR" != "$HOME" ]; do
-		AUTOSRCDIR="${AUTOSRCDIR%/*}"
-		echo "Searching in: $AUTOSRCDIR"
-	done
+	# while [ ! -f "$AUTOSRCDIR"/autosource ] && [ ! -f "$AUTOSRCDIR"/.autosource ] && [ "$AUTOSRCDIR" ] && [ "$AUTOSRCDIR" != "$HOME" ]; do
+	# 	AUTOSRCDIR="${AUTOSRCDIR%/*}"
+	# 	echo "Searching in: $AUTOSRCDIR"
+	# done
 
 	if [ -f "$AUTOSRCDIR/autosource" ]; then
 		AUTOSRCFILE="$AUTOSRCDIR/autosource"
@@ -228,15 +231,15 @@ c(){
 	fi
 
 	if [ -f "$AUTOSRCFILE" ]; then
-		if [ "$PWD" = "$AUTOSRCDIR" ] || read -p "About to source $AUTOSRCFILE:"; then
-			if [ "$AUTOSOURCE_VERBOSE" ]; then
-				echo "_____________________________________"
-				echo -e "Autosourcing $AUTOSRCFILE:"
-				grep -E -- "alias|\(\)" "$AUTOSRCFILE" | grep -v "^#"
-				echo "_____________________________________"
-			fi
+		# if [ "$PWD" = "$AUTOSRCDIR" ] || read -p "About to source $AUTOSRCFILE:"; then
+			# if [ "$AUTOSOURCE_VERBOSE" ]; then
+			# 	echo "_____________________________________"
+			# 	echo -e "Autosourcing $AUTOSRCFILE:"
+			# 	grep -E -- "alias|\(\)" "$AUTOSRCFILE" | grep -v "^#"
+			# 	echo "_____________________________________"
+			# fi
 			source "$AUTOSRCFILE"
-		fi
+		# fi
 	elif [ "$PWD" != "$HOME" ]; then
 		echo "autosource file not found" >&2
 	fi
@@ -274,12 +277,41 @@ c(){
 # 	mvn versions:set -DnewVersion=$*
 # }
 
-function cv () {
-    cdargs "$1" && cd "`cat "$HOME/.cdargsresult"`" ;
+# function cv () {
+#     cdargs "$1" && cd "`cat "$HOME/.cdargsresult"`" ;
+# }
+
+# Find a file with a pattern in name:
+function ff() { find . -follow -iname $* -ls ; }
+
+function fstr()
+{
+    OPTIND=1
+    local case=""
+    local usage="fstr: find string in files.
+Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+    while getopts :it opt
+    do
+        case "$opt" in
+        i) case="-i " ;;
+        *) echo "$usage"; return;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    if [ "$#" -lt 1 ]; then
+        echo "$usage"
+        return;
+    fi
+    #find . ${3:-} -type f | grep -v "\.svn/" | xargs grep --color -sn ${case} "$1" {} 2>&-
+    #find . ${3:-} -type f -name "${2:-*}" | grep -v "\.svn/" | xarg -t grep --color -sn ${case} "$1" {} 2>&-
+    find . ${3:-} -type f -name "${2:-*}" -not -path "*/.tags" -not -path "./.git/*" -not -path "./tmp/*" -print0 | xargs -0 grep --color -sn ${case} "$1" 2>&-
+}
+function fstrLocal(){
+	fstr "$1" "${2:-*}" "-maxdepth ${3:-1}"
 }
 
 alias portListeners='lsof -nP -iTCP | grep LISTEN'
-alias coli='colima -p vz'
+
 alias pydocweb='python -m pydoc -p 4444'
 alias vs='open -a "Visual Studio Code"'
 
