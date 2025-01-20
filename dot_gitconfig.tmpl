@@ -1,0 +1,58 @@
+
+[user]
+	# https://www.chezmoi.io/user-guide/manage-machine-to-machine-differences/
+	email = {{ .gitconfig.email }}
+
+[alias]
+	s = status
+	st = status --short
+	b = branch -a --color
+	d = branch -d
+	#lol = log --graph --color --oneline
+	ci = commit -v -a
+	c = checkout
+	cb = checkout -b
+	lgs = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	lge = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%ae]" --decorate
+	lol = log --graph --abbrev-commit --decorate --date=relative --pretty=format:'%C(bold blue)%h%C(reset) %C(green)(%ar) %C(white)- %an%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset)' --all
+	p = pull -p
+	ignored = ls-files --other --ignored --exclude-standard
+   m = merge --no-ff
+	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f"
+
+[pager]
+   grep = false
+[push]
+	default = current
+[gui]
+	editor = subl --wait
+	historybrowser = gitk
+[cola]
+	linebreak = false
+	spellcheck = false
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+	editor = vim
+	excludesfile = /Users/yoom/.gitignore_global
+	autocrlf = input
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path =
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+
+# https://git-scm.com/docs/gitcredentials
+# https://git-scm.com/docs/git-credential-store
+# git help -a | grep credential
+# https://docs.github.com/en/get-started/getting-started-with-git/updating-credentials-from-the-macos-keychain
+# https://stackoverflow.com/questions/47465644/github-remote-permission-denied
+[credential]
+	helper = store
+[credential "github.com"]
+	useHttpPath = true
