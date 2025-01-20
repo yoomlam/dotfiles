@@ -13,5 +13,8 @@
 /.oh-my-zsh/plugins/**/LICENSE
 /.oh-my-zsh/plugins/z/img/
 
-# Ignore Bash for now
+{{- if eq .chezmoi.os "darwin"}}
 /.bash*
+{{- else}}
+/.hammerspoon
+{{- end}}
