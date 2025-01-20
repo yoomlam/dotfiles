@@ -28,6 +28,7 @@ chezmoi usage ([user guide](https://www.chezmoi.io/user-guide)):
 - `chezmoi edit <file>` [how-do-i-edit-my-dotfiles-with-chezmoi](https://www.chezmoi.io/user-guide/frequently-asked-questions/usage/#how-do-i-edit-my-dotfiles-with-chezmoi)
 	- If the file was modified outside chezmoi, `chezmoi merge <file>` to merge those changes or `chezmoi re-add <file>` to overwrite with the changes
 - Use `git` when ready to commit and push in `chezmoi cd`
+- `chezmoi archive` generates a [tarball of your dotfiles](https://www.chezmoi.io/user-guide/advanced/migrate-away-from-chezmoi/)
 
 chezmoi contents:
 - [~/.oh-my-zsh is imported](https://www.chezmoi.io/user-guide/include-files-from-elsewhere/#include-a-subdirectory-from-a-url) and managed in `.chezmoiexternal.toml`, so any modifications would be lost after a `chezmoi apply`

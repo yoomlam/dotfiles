@@ -1,7 +1,14 @@
 **/.DS_Store
 /README.md
+
+# Old
 /.vim
+
+# Not used
 /.mime.types
+
+# Replaced with zsh's suffix alias feature
+/.lessfilter
 
 # https://www.chezmoi.io/user-guide/include-files-from-elsewhere/#include-a-subdirectory-from-a-url
 /.oh-my-zsh/cache/
@@ -15,6 +22,7 @@
 
 {{- if eq .chezmoi.os "darwin"}}
 /.bash*
+/.mailcap
 {{- else}}
 /.hammerspoon
 /Brewfile
