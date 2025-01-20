@@ -38,7 +38,7 @@
 	required = true
 [core]
 	editor = vim
-	excludesfile = /Users/yoom/.gitignore_global
+	excludesfile = {{ .chezmoi.homeDir }}/.gitignore_global
 	autocrlf = input
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
