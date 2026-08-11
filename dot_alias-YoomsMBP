@@ -2,6 +2,16 @@
 [ -f "$HOME/.alias-macos" ] && source "$HOME/.alias-macos"
 
 alias df='df -kh'
+alias cat=bat
+# Don't show line numbers
+export BAT_STYLE=plain
+
+# Reminder: ripgrep
+
+# the -m flag allows to select multiple files with TAB
+prev(){
+  bat $(fzf -m --preview="bat --color=always {}" --query="$1")
+}
 
 #####
 # Custom DSVA Appeals config
@@ -186,3 +196,6 @@ o(){
       ;;
   esac
 }
+
+
+alias claude-skip='claude --dangerously-skip-permissions'

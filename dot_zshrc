@@ -11,6 +11,10 @@
 # export MY_NOBACKUP=$HOME/NOBACKUP
 # [ -d "$MY_NOBACKUP" ] || mkdir "$MY_NOBACKUP"
 
+# https://apple.stackexchange.com/a/69332
+# use these commands with their normal names
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+
 # $TEMP is used by many apps (e.g. gs, ps2pdf, gksudo)
 # Must use actual resolved directory since root will not have permissions to a mounted home directory or its subdirs
 if [ -e "$HOME/.tmp" ]; then
@@ -149,6 +153,7 @@ zshaddhistory() {
 # zshaddhistory
 
 # This speeds up pasting w/ autosuggest
+# Fixes slow paste issue with bracketed-paste-magic
 # https://github.com/zsh-users/zsh-autosuggestions/issues/238#issuecomment-389324292
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
@@ -164,14 +169,24 @@ zstyle :bracketed-paste-magic paste-finish pastefinish
 # bindkey "^Xa" _expand_alias
 zstyle ':completion:*' completer _expand_alias _complete _ignored
 
+# https://github.com/rothgar/mastering-zsh/blob/master/docs/helpers/bindkey.md
+# https://github.com/rothgar/mastering-zsh/blob/master/docs/usage/line_movement.md
+# https://github.com/rothgar/mastering-zsh/blob/master/docs/helpers/widgets.md
+
+# ^[OA = up arrow
+# ^[OB = down arrow
+# ^[OC = right arrow
+# ^ = Ctrl
+# ^[ = Alt
+# \e or \E = Escape
+
 
 # https://superuser.com/questions/446594/separate-up-arrow-lookback-for-local-and-global-zsh-history
 # https://superuser.com/questions/714412/zsh-or-maybe-oh-my-zsh-history-gets-confused-with-multi-line-commands
-bindkey "OA" up-line-or-local-history
-bindkey "[A" up-line-or-local-history
-bindkey "OB" down-line-or-local-history
-bindkey "[B" down-line-or-local-history
-
+# bindkey "OA" up-line-or-local-history
+# bindkey "[A" up-line-or-local-history
+# bindkey "OB" down-line-or-local-history
+# bindkey "[B" down-line-or-local-history
 up-line-or-local-history() {
     zle set-local-history 1
     zle up-line-or-search
@@ -184,18 +199,36 @@ down-line-or-local-history() {
     zle set-local-history 0
 }
 zle -N down-line-or-local-history
-
 bindkey "^[[1;5A" up-line-or-history    # [CTRL] + Cursor up
 bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
+# To see the function associated with a zle widget: https://unix.stackexchange.com/questions/358598/how-can-i-find-the-zsh-function-associated-with-a-zle-widget
+# eg: echo $widgets[down-line-or-local-history]
 
 # TIP: `bindkey -M emacs` to list bindings for a emacs keymap
-# `zle -al` shows possible commands for binding
+# `zle -al` shows possible commands for binding or https://zsh.sourceforge.io/Doc/Release/Zsh-Line-Editor.html#History-Control
+
 
 # Reminder: kitty.conf: macos_option_as_alt left
-bindkey '\M-.' insert-last-word
+# bindkey '\M-.' insert-last-word
 # See kitty.conf: bindkey '\C-.' insert-last-word
+
+# iTerm: must map Option key to Meta
+# bindkey "\M-." insert-last-word
 # iTerm: https://gist.github.com/YumaInaura/27bb1f79881a63bed2fb9635cbaed73b
-bindkey ≥ insert-last-word
+# Otherwise must use character
+#bindkey "≥" insert-last-word # Meta-.
+bindkey "^n" insert-last-word
+
+# inserts first word from previous -- https://github.com/zsh-users/zsh-autosuggestions/issues/748#issuecomment-1616256496
+bindkey -s '\M-,' '\e0\e.'
+
+# to partial accept zsh-autosuggestions
+# Meta-right/left arrows work by default via iTerm's key mappings
+# Bind other key combinations:
+bindkey "\M-f" forward-word
+bindkey "\M-b" backward-word
+# bindkey "ƒ" forward-word  # Meta-f
+# bindkey "∫" backward-word # Meta-b
 
 __ECHO_TIMER "bindkey"
 
@@ -214,9 +247,11 @@ fi
 ### Lazy-initializers
 
 _add_bootstrap_func(){
+  # $1 is "app default_arg1 default_arg2"
   local APP=${1%% *}
   # When the app is first run, function _bootstrap_$APP() is run.
-  # If no args are provided, then the specified $1 is run.
+  # If args are provided when app is first run, then app is run with the args
+  # If no arg is provided when app is first run, then the specified $1 string is run with its default args.
   eval "function $APP(){
     unfunction $APP
     # echo \"(lazy loading: $APP)\"
@@ -236,6 +271,8 @@ _bootstrap_ssh(){
   # check if shell is interactive
   if [[ $- == *i* ]]; then
     if ! ssh-add -l > /dev/null; then
+      # add the key specified in `~/.ssh/config`
+      # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent
       ssh-add
     fi
   fi
@@ -249,30 +286,57 @@ _bootstrap_nnn(){
 
 _add_bootstrap_func "conda env list"
 _bootstrap_conda(){
-  # >>> conda initialize >>>
-  # !! Contents within this block are managed by 'conda init' !!
-  __conda_setup="$('/Users/yoom/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-  if [ $? -eq 0 ]; then
-      eval "$__conda_setup"
-  else
-      if [ -f "/Users/yoom/anaconda3/etc/profile.d/conda.sh" ]; then
-          . "/Users/yoom/anaconda3/etc/profile.d/conda.sh"
-      else
-          export PATH="/Users/yoom/anaconda3/bin:$PATH"
-      fi
-  fi
-  unset __conda_setup
-  # <<< conda initialize <<<  
+  echo "Use uv instead"
+  return
+  # # >>> conda initialize >>>
+  # # !! Contents within this block are managed by 'conda init' !!
+  # __conda_setup="$('/Users/yoom/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  # if [ $? -eq 0 ]; then
+  #     eval "$__conda_setup"
+  # else
+  #     if [ -f "/Users/yoom/anaconda3/etc/profile.d/conda.sh" ]; then
+  #         . "/Users/yoom/anaconda3/etc/profile.d/conda.sh"
+  #     else
+  #         export PATH="/Users/yoom/anaconda3/bin:$PATH"
+  #     fi
+  # fi
+  # unset __conda_setup
+  # # <<< conda initialize <<<  
 }
 
-_add_bootstrap_func "go"
-_bootstrap_go(){
-  source ~/.golangrc
-}
+# _add_bootstrap_func "go"
+# _bootstrap_go(){
+#   # [ -f ~/.golangrc ] && source ~/.golangrc
+#   # export PATH=$HOME/go/bin:$PATH
+#   echo "Reminder: After using go get/install, run 'asdf reshim golang' to get any new shims."
+#   . ~/.asdf/plugins/golang/set-env.zsh
+# }
+
+# Use mise instead
 # _bootstrap_nvm(){
 #   export NVM_DIR="$HOME/.nvm"
 #   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 #   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# }
+
+# Use mise to add jbang instead
+# _add_bootstrap_func "jbang"
+# _bootstrap_jbang(){
+#   # Add JBang to environment
+#   alias j!=jbang
+#   export PATH="$HOME/.jbang/bin:$PATH"
+# }
+
+# Always enabled
+eval "$(mise activate zsh)"
+# _add_bootstrap_func "mise list"
+# _bootstrap_mise(){
+# # Replaces asdf and dotenv
+# #   May also be able to replace functionality in chpwd_functions
+#   _evalcache mise activate zsh
+#   # TODO: move to a _bootstrap_poetry?
+#   # omz plugin load poetry
+# #__ECHO_TIMER "mise"
 # }
 
 
@@ -301,6 +365,7 @@ _bootstrap_go(){
 setopt extendedglob
 
 # https://scriptingosx.com/2019/07/moving-to-zsh-part-5-completions/
+# Rebuild the completion index
 autoload -Uz compinit
 __ECHO_TIMER "autoload compinit"
 for dump in ~/.zcompdump(N.mh+24); do
@@ -319,18 +384,6 @@ __ECHO_TIMER "Done zshrc part 1"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 __ECHO_TIMER "p10k"
 
-if [ "$HOMEBREW_PREFIX" ]; then
-  # TODO: replace asdf and dotenv/direnv with mise: https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
-  #   My also be able to replace functionality in chpwd_functions
-  #   There's a OMZ mise plugin
-  # Instead of using the asdf zsh plugin
-  # https://github.com/ohmyzsh/ohmyzsh/issues/10484#issuecomment-997545691
-  unset ASDF_DIR
-  source $(brew --prefix asdf)/libexec/asdf.sh
-  # TIP: `asdf reshim python` after a `pip install` https://til.hashrocket.com/posts/ques11vrjs-get-pip-installed-executables-into-the-asdf-path
-  __ECHO_TIMER "asdf"
-fi
-
 # Plugins are in $ZSH_CUSTOM
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
@@ -342,28 +395,33 @@ fi
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 
+# to avoid triggering zsh-autosuggestion for strings that are too long
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
+
 # Reminder to add new plugins to .chezmoiexternal.toml
 plugins=(
+  # https://apple.stackexchange.com/a/69332
   gnu-utils
-  dotenv
+  # Replaced by mise (sort of); may not be needed with uv and devcontainers: dotenv
   zsh-interactive-cd
   z
   sublime
-  # Remember to replace `eval ...` calls with `_evalcache ...`; ~/.zsh-evalcache/
+  # Remember to replace `eval $(...)` calls with `_evalcache ...`; ~/.zsh-evalcache/
   evalcache
   zsh-autosuggestions
 
   # Instead, manually run `omz update && upgrade_oh_my_zsh_custom`
   # autoupdate
+  # poetry
 )
 
 # TODO: remove OS-specific conditional; do we need zsh-nvm or can it be loaded by .env?
 : ${SHORT_HOST:=`hostname -s`}
 if [ `uname -o` = "Darwin" ]; then
   plugins+=(
-    poetry
+    # poetry
     # lazy-load nvm; Actual loading of nvm is triggered by running the nvm, node, npm, ...
-    zsh-nvm
+    # conflicts with asdf: zsh-nvm
   )
 fi
 
@@ -425,6 +483,9 @@ __ECHO_TIMER "funcs and aliases"
 # If you don't want/need a background service you can just run:
 #  /opt/homebrew/opt/postgresql@14/bin/postgres -D /opt/homebrew/var/postgresql@14
 
+# an industry-standard mechanism used to opt out of telemetry and anonymous usage data collection
+export DO_NOT_TRACK=true
+
 # TODO: remove OS-specific conditional
 if [ `uname -o` = "Darwin" ]; then
   #. "$HOME/.atuin/bin/env"
@@ -435,4 +496,24 @@ fi
 
 # [ "$PWD" = "$HOME" ] || a
 
+# https://github.com/rothgar/mastering-zsh/blob/master/docs/usage/navigation.md
+export cdpath=(. ~ ~/dev ~/Downloads ~/.config)
+setopt auto_cd
+
+# To ensure Databricks <TAB> completion works
+fpath+=/opt/homebrew/share/zsh/site-functions
+
 __ECHO_TIMER "Done zshrc"
+
+
+# BEGIN opam configuration
+# This is useful if you're using opam as it adds:
+#   - the correct directories to the PATH
+#   - auto-completion for the opam binary
+# This section can be safely removed at any time if needed.
+[[ ! -r '/Users/yoom/.opam/opam-init/init.zsh' ]] || source '/Users/yoom/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
+# END opam configuration
+
+# Composio CLI
+export COMPOSIO_INSTALL_DIR="/Users/yoom/.composio"
+export PATH="$COMPOSIO_INSTALL_DIR:$PATH"

@@ -2,6 +2,9 @@
 
 export LC_ALL=en_US.UTF-8
 
+# so that lazygit and other apps use this folder instead of ~/Library/App...
+export XDG_CONFIG_HOME="$HOME/.config"
+
 export CLICOLOR=1
 export BROWSER=open
 export VISUAL="subl --wait"
@@ -29,3 +32,8 @@ export EDITOR=vim
 # put gnu-getopt first
 # export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
 # export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+
+# Setting PATH for Python 2.7
+# The original version is saved in .zprofile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+export PATH

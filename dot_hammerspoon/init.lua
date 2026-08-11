@@ -9,10 +9,13 @@ ctrlcmdshift = {"ctrl", "cmd", "shift"}
 hyper = {"ctrl", "alt", "cmd"}
 hypershift = {"ctrl", "alt", "cmd", "shift"}
 
+-- disable animation to reduce lag in moving windows
+hs.window.animationDuration = 0
+
 -- https://www.hammerspoon.org/Spoons/ReloadConfiguration.html
 hs.loadSpoon("ReloadConfiguration")
 -- Load manually: (https://github.com/Hammerspoon/hammerspoon/blob/master/SPOONS.md#hotkeys)
-spoon.ReloadConfiguration:bindHotkeys({ reloadConfiguration = {ctrlcmdshift, "r"} })
+-- spoon.ReloadConfiguration:bindHotkeys({ reloadConfiguration = {ctrlcmdshift, "r"} })
 -- OR automatically upon changes:
 -- spoon.ReloadConfiguration:start()
 
@@ -29,10 +32,6 @@ CURR_SCREEN_WINFILTER = hs.window.filter.new(function(w)
   return w:screen() == hs.screen.mainScreen() and CURR_SPACE_WINFILTER:isWindowAllowed(w)
 end)
 
--- Use Karabiner to map CapsLock to Fn
--- Karabiner overrides this: System Preferences > Keyboard > Modifier Keys, and set the caps lock key to a modifier key.
-require('modkey-to-escape'):start('fn')
--- interferes with doubletapping Ctrl: hs.loadSpoon('ControlEscape'):start()
 
 --- Keyboard key bindings
 --- See Karabiner https://ke-complex-modifications.pqrs.org
@@ -40,24 +39,25 @@ require('modkey-to-escape'):start('fn')
 --   function() hs.eventtap.keyStroke('alt', 'left', 0) end)
 -- hs.hotkey.bind('ctrl', 'right', nil,
 --   function() hs.eventtap.keyStroke('alt', 'right', 0) end)
-hs.hotkey.bind('ctrl', 'up', nil,
-  function() hs.eventtap.keyStroke(nil, 'pageup', 0) end)
-hs.hotkey.bind('ctrl', 'down', nil,
-  function() hs.eventtap.keyStroke(nil, 'pagedown', 0) end)
+
+-- hs.hotkey.bind('ctrl', 'up', nil,
+--   function() hs.eventtap.keyStroke(nil, 'pageup', 0) end)
+-- hs.hotkey.bind('ctrl', 'down', nil,
+--   function() hs.eventtap.keyStroke(nil, 'pagedown', 0) end)
 
 --- Make this hard to reach since doubletap-flag will be used
 -- Keys that don't work: "f"*, "home", "end"
 -- print(hs.inspect(hs.keycodes.map))
 local ENTITIES_ModalKey   = 'pad-'
 local SELECT_ModalKey     = 'pad+'
-local WINDOWING_ModalKey = "pad1"
+-- local WINDOWING_ModalKey = "pad1"
 local HS_EXPOSE_ModalKey  = "pad5"
 --- double tap a modifier key to send a keystroke, such as to enable a modal
 require('doubletap-flag'):start({
     {{"shift"}, {hypershift, SELECT_ModalKey}},
     {{"cmd"},   {hypershift, ENTITIES_ModalKey}},
-    {{"ctrl"},  {hypershift, WINDOWING_ModalKey}},
-    {{"alt"},   {hypershift, HS_EXPOSE_ModalKey}},
+    -- {{"ctrl"},  {hypershift, WINDOWING_ModalKey}},
+    -- {{"alt"},   {hypershift, HS_EXPOSE_ModalKey}},
 })
 
 require('helpers')
@@ -99,11 +99,11 @@ function addToAppModals(flags, key, appName)
   APPS_SELECT_MODAL:bind(flags, key, "Select "..appName, function() apps:showAppChooser(appName) end)
 end
 
-addToAppModals(nil, "x", "kitty") -- net.kovidgoyal.kitty; iTerm
+addToAppModals(nil, "x", "iTerm") -- net.kovidgoyal.kitty; iTerm
 addToAppModals(nil, "a", "Microsoft Edge")
 addToAppModals(nil, "s", "Safari")
 addToAppModals(nil, "f", "Firefox")
-addToAppModals(nil, "g", "Google Chrome")
+-- addToAppModals(nil, "g", "Google Chrome")
 addToAppModals(nil, "t", "Sublime Text")
 
 -- table.insert( appChoices, { text="n", subText="mdNotes (Sublime ~/Documents/mdNotes)",
@@ -114,18 +114,18 @@ addToAppModals(nil, "t", "Sublime Text")
 -- end)
 
 table.insert( appChoices, { text="h", subText="~/.hammerspoon (Sublime ~/.hammerspoon/)",
-  execCommand="~/bin/subl ~/.hammerspoon/" } )
+  execCommand="~/.local/bin/subl ~/.hammerspoon/" } )
 APPS_LAUNCH_MODAL:bind(nil, 'h', "hammerspoon", function()
   exitModal()
-  executeCommand("~/bin/subl ~/.hammerspoon/")
+  executeCommand("~/.local/bin/subl ~/.hammerspoon/")
 end)
 
-table.insert( appChoices, { text="r", subText=".my_repl.rb (Sublime ~/.my_homedir/my_repl.rb)",
-  execCommand="~/bin/subl ~/.my_homedir/my_repl.rb" } )
-APPS_LAUNCH_MODAL:bind(nil, 'r', "my_repl.rb", function()
-  exitModal()
-  executeCommand("~/bin/subl ~/.my_homedir/my_repl.rb")
-end)
+-- table.insert( appChoices, { text="r", subText=".my_repl.rb (Sublime ~/.my_homedir/my_repl.rb)",
+--   execCommand="~/bin/subl ~/.my_homedir/my_repl.rb" } )
+-- APPS_LAUNCH_MODAL:bind(nil, 'r', "my_repl.rb", function()
+--   exitModal()
+--   executeCommand("~/bin/subl ~/.my_homedir/my_repl.rb")
+-- end)
 
 --- textual window chooser
 table.insert( appChoices, {text="q", subText="Window chooser"} )
@@ -148,16 +148,16 @@ APPS_LAUNCH_MODAL:bind(nil, 'e', "Select URL", urlChooser.showUrlChooser)
 APPS_SELECT_MODAL:bind(nil, 'e', "Select URL", urlChooser.showUrlChooser)
 
 --- Paste clip
-local clipPaster=require('paste-clip')
-table.insert( appChoices, {text="v", subText="Clip chooser"} )
-APPS_LAUNCH_MODAL:bind(nil, 'v', "Select Snippets", clipPaster.showClipChooser)
-APPS_SELECT_MODAL:bind(nil, 'v', "Select Snippets", clipPaster.showClipChooser)
+-- local clipPaster=require('paste-clip')
+-- table.insert( appChoices, {text="v", subText="Clip chooser"} )
+-- APPS_LAUNCH_MODAL:bind(nil, 'v', "Select Snippets", clipPaster.showClipChooser)
+-- APPS_SELECT_MODAL:bind(nil, 'v', "Select Snippets", clipPaster.showClipChooser)
 
 --- Use modal mode for window selection/navigation
-local winLayoutTips="\n⇧ = snap\n⌥ = resize\n⌃⇧ = nudge"
-WSELECT_MODAL = kbModal:newModal(hypershift, WINDOWING_ModalKey, "🌬 Window Layout mode"..winLayoutTips)
-require('win-selecting')
-require('win-moving')
+-- local winLayoutTips="\n⇧ = snap\n⌥ = resize\n⌃⇧ = nudge"
+-- WSELECT_MODAL = kbModal:newModal(hypershift, WINDOWING_ModalKey, "🌬 Window Layout mode"..winLayoutTips)
+-- require('win-selecting')
+-- require('win-moving')
 
 
 -------------------------------------------------
@@ -177,7 +177,8 @@ print("== Application key bindings:")
 -- hs.hotkey.bind(ctrlcmd, "i", function() apps:newWindow("iTerm") end)
 -- hs.hotkey.bind(ctrlcmd, "x", function() apps:cmdN("net.kovidgoyal.kitty", "/usr/local/bin/kitty -d=$HOME &") end)
 -- hs.hotkey.bind(ctrlcmdshift, "x", function() executeCommand("/usr/local/bin/kitty -d=$HOME &") end)
-bindExecuteCommand(ctrlcmd, "x", "open -a Kitty")
+-- bindExecuteCommand(ctrlcmd, "x", "open -a Kitty")
+-- bindExecuteCommand(ctrlcmd, "x", "open -a iTerm")
 bindExecuteCommand(ctrlcmd, "p", "open -a Screenshot")
 -- bindExecuteCommand(ctrlcmd, "m", "open -a 'Mission Control'")
 -- bindExecuteCommand("alt-shift", "z", "pmset displaysleepnow")
@@ -187,13 +188,13 @@ bindExecuteCommand(ctrlcmd, "p", "open -a Screenshot")
 -------------------------------------------------
 --- Replacement for Clipy
 -- https://www.hammerspoon.org/Spoons/ClipboardTool.html
-txtClipboard=hs.loadSpoon("ClipboardTool")
-txtClipboard.deduplicate=true
-txtClipboard.paste_on_select=true
-txtClipboard.show_in_menubar=false
--- instance methods
-txtClipboard:start()
-hs.hotkey.bind(ctrlcmd, "v", "Clipboard", function() txtClipboard:toggleClipboard() end)
+-- txtClipboard=hs.loadSpoon("ClipboardTool")
+-- txtClipboard.deduplicate=true
+-- txtClipboard.paste_on_select=true
+-- txtClipboard.show_in_menubar=false
+-- -- instance methods
+-- txtClipboard:start()
+-- hs.hotkey.bind(ctrlcmd, "v", "Clipboard", function() txtClipboard:toggleClipboard() end)
 
 local openMac=require('open-mac')
 openMac:start(bindExecuteCommand, txtClipboard)
@@ -206,7 +207,7 @@ urlHandler:start()
 
 -------------------------------------------------
 --- Window management
-require('win-switcher')
+-- require('win-switcher')
 
 require('menubar')
 

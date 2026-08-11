@@ -7,8 +7,6 @@
 UNAME=`uname`
 case "$UNAME" in
 	Linux)
-	alias df='df -kTh'
-
 	# The 'ls' family (this assumes you use the GNU ls)
 	# alias ls='echo $PWD >| $TMP/$USER-lastPWD; ls -h --color=auto'
 
@@ -17,8 +15,6 @@ case "$UNAME" in
 	;;
 
 	Darwin)
-	alias df='df -kh'
-
 	alias pt='pstree -g 3 -u $USER'
 	;;
 
@@ -42,14 +38,12 @@ alias cdz='cd "`nnn -odp -`"'
 alias rm='rm -vi'
 alias mv='mv -vi'
 alias cp='cp -av'
-alias du='du -kh'
+alias du='dust' # 'du -kh'
+alias df='df -kTh'
 #alias +='pushd .'
 #alias _='popd'
 #alias j='jobs -l'
 
-alias l='ls -laFh'
-alias ll='ls -lFh'
-alias lt='ls -latrFh'           # sort by date
 alias tree='tree -Cus'          # nice alternative to 'ls'
 
 #ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
@@ -61,6 +55,10 @@ alias x='eza --all --long --icons --no-user --time-style=long-iso --git --group-
 alias xx='x --tree --level=2'
 alias xxx='x --tree --level=3'
 alias xd='x -D'
+alias xt='x --sort newest'
+alias l='x'  # 'ls -laFh'
+alias lt='xt' # 'ls -latrFh'           # sort by date
+alias ll='ls -lFh'
 
 alias grep='grep --color'
 # alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
@@ -114,6 +112,8 @@ alias dateStr='date +%Y-%m-%d-%T'
 alias dockr_jupyter='echo "Running on port 8890"; docker run -p 8890:8888 -v `pwd`:/home/jovyan/on_host jupyter/scipy-notebook'
 alias dockr_jupyter_ruby='echo "Running on port 8891"; docker run -p 8891:8888 -v `pwd`:/home/jovyan/on_host rubydata/datascience-notebook'
 
+# Some builds still use python2
+#alias python=python3
 
 alias gg='git grep -n'
 alias zg='lazygit'
@@ -127,7 +127,7 @@ alias zd='lazydocker'
 # }
 
 alias tidyxml='tidy -xml -indent -wrap 120'
-alias jsontidy='python -mjson.tool'
+alias jsontidy='python3 -mjson.tool'
 
 # alias shot='import -window root $HOME/root.jpeg'
 # alias htmlview='$BROWSER'
@@ -288,31 +288,32 @@ a(){
 # Find a file with a pattern in name:
 function ff() { find . -follow -iname $* -ls ; }
 
-function fstr()
-{
-    OPTIND=1
-    local case=""
-    local usage="fstr: find string in files.
-Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
-    while getopts :it opt
-    do
-        case "$opt" in
-        i) case="-i " ;;
-        *) echo "$usage"; return;;
-        esac
-    done
-    shift $(( $OPTIND - 1 ))
-    if [ "$#" -lt 1 ]; then
-        echo "$usage"
-        return;
-    fi
-    #find . ${3:-} -type f | grep -v "\.svn/" | xargs grep --color -sn ${case} "$1" {} 2>&-
-    #find . ${3:-} -type f -name "${2:-*}" | grep -v "\.svn/" | xarg -t grep --color -sn ${case} "$1" {} 2>&-
-    find . ${3:-} -type f -name "${2:-*}" -not -path "*/.tags" -not -path "./.git/*" -not -path "./tmp/*" -print0 | xargs -0 grep --color -sn ${case} "$1" 2>&-
-}
-function fstrLocal(){
-	fstr "$1" "${2:-*}" "-maxdepth ${3:-1}"
-}
+alias fstr='echo Use rg/ripgrep instead'
+# function fstr()
+# {
+#     OPTIND=1
+#     local case=""
+#     local usage="fstr: find string in files.
+# Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+#     while getopts :it opt
+#     do
+#         case "$opt" in
+#         i) case="-i " ;;
+#         *) echo "$usage"; return;;
+#         esac
+#     done
+#     shift $(( $OPTIND - 1 ))
+#     if [ "$#" -lt 1 ]; then
+#         echo "$usage"
+#         return;
+#     fi
+#     #find . ${3:-} -type f | grep -v "\.svn/" | xargs grep --color -sn ${case} "$1" {} 2>&-
+#     #find . ${3:-} -type f -name "${2:-*}" | grep -v "\.svn/" | xarg -t grep --color -sn ${case} "$1" {} 2>&-
+#     find . ${3:-} -type f -name "${2:-*}" -not -path "*/.tags" -not -path "./.git/*" -not -path "./tmp/*" -print0 | xargs -0 grep --color -sn ${case} "$1" 2>&-
+# }
+# function fstrLocal(){
+# 	fstr "$1" "${2:-*}" "-maxdepth ${3:-1}"
+# }
 
 alias portListeners='lsof -nP -iTCP | grep LISTEN'
 

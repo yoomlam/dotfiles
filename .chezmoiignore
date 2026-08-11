@@ -23,6 +23,8 @@
 {{- if eq .chezmoi.os "darwin"}}
 /.bash*
 /.mailcap
+/.ssh/config
+/.inputrc
 {{- else}}
 /.hammerspoon
 /Brewfile

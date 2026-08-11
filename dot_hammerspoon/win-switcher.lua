@@ -5,12 +5,14 @@ switcher.ui.textSize = 10
 switcher.ui.showSelectedThumbnail = true
 switcher.ui.fontName = ".AppleSystemUIFont"
 
+-- Use faster AltTab app instead
+
 -- all spaces
-switcher_all = switcher.new(hs.window.filter.new():setCurrentSpace(nil), {
-	showSelectedThumbnail = true,
-})
-hs.hotkey.bind('option',      'tab',function()switcher_all:next()end)
-hs.hotkey.bind('option-shift', 'tab',function()switcher_all:previous()end)
+-- switcher_all = switcher.new(hs.window.filter.new():setCurrentSpace(nil), {
+-- 	showSelectedThumbnail = true,
+-- })
+-- hs.hotkey.bind('option',      'tab',function()switcher_all:next()end)
+-- hs.hotkey.bind('option-shift', 'tab',function()switcher_all:previous()end)
 
 -- Current space only
 switcher_space = switcher.new(CURR_SPACE_WINFILTER, {
@@ -20,7 +22,7 @@ hs.hotkey.bind(ctrlcmd,'tab',function()switcher_space:next()end)
 hs.hotkey.bind(ctrlcmdshift,'tab',function()switcher_space:previous()end)
 
 -- specialized switcher for your dozens of browser windows :)
-switcher_browsers = switcher.new({'Safari','Google Chrome','Firefox'}, {
+switcher_browsers = switcher.new({'Safari','Google Chrome','Firefox', 'Microsoft Edge'}, {
 	showSelectedThumbnail = true,
 	selectedThumbnailSize = 400
 })

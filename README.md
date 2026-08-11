@@ -4,6 +4,7 @@ Reminders:
 	- configures GPG, so copy over `~/.gnupg` to encrypt files
 - Use [pass](https://www.passwordstore.org/) to populate sensitive data in chezmoi templates
 	- `pass` uses GPG, so copy over `~/.gnupg`
+- `~/.gnupg` is synced to a secured cloud
 
 Sensitive storage options from least to most secure:
 1. Store as clear text in `~/.config/chezmoi/chezmoi.toml` as `[data]` per machine (not in git) and use chezmoi template.
@@ -33,6 +34,10 @@ chezmoi usage ([user guide](https://www.chezmoi.io/user-guide)):
 chezmoi contents:
 - [~/.oh-my-zsh is imported](https://www.chezmoi.io/user-guide/include-files-from-elsewhere/#include-a-subdirectory-from-a-url) and managed in `.chezmoiexternal.toml`, so any modifications would be lost after a `chezmoi apply`
 - Only specific plugins are included as specified in `.chezmoiexternal.toml`
+
+[GPG usage](https://www.devdungeon.com/content/gpg-tutorial):
+- `gpg --list-secret-keys --with-keygrip` and `gpg --fingerprint --with-keygrip` displays the keygrip
+- `gpg-connect-agent 'keyinfo --list' /bye` shows [what's in gpg-agent](https://unix.stackexchange.com/questions/71135/how-can-i-find-out-what-keys-gpg-agent-has-cached-like-how-ssh-add-l-shows-yo)
 
 Scripts/utils:
 - frequent or commonly used scripts are under `~/bin`

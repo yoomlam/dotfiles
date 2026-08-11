@@ -3,7 +3,7 @@ local function openMacCommand(cmd)
   if cmd==nil then
     cmd=hs.pasteboard.readString()
   end
-  return "~/bin/open_mac.sh "..cmd
+  return "~/.local/bin/open_mac.sh "..cmd
 end
 
 local function executeChoice(choice)
