@@ -515,5 +515,5 @@ __ECHO_TIMER "Done zshrc"
 # END opam configuration
 
 # Composio CLI
-export COMPOSIO_INSTALL_DIR="/Users/yoom/.composio"
-export PATH="$COMPOSIO_INSTALL_DIR:$PATH"
+# export COMPOSIO_INSTALL_DIR="/Users/yoom/.composio"
+# export PATH="$COMPOSIO_INSTALL_DIR:$PATH"
